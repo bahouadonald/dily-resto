@@ -3,6 +3,7 @@ import { CartProvider } from "./context/CartContext";
 import CataloguePlats from "./pages/CataloguePlats";
 import ProfilRestaurant from "./pages/ProfilRestaurant";
 import Panier from "./pages/Panier";
+import Livraison from "./pages/Livraison";
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Route path="/" element={<CataloguePlats />} />
           <Route path="/restaurant/:id" element={<ProfilRestaurant />} />
           <Route path="/panier" element={<Panier />} />
+          <Route path="/livraison" element={<Livraison />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
