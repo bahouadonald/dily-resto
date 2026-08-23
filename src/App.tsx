@@ -11,6 +11,7 @@ import InscriptionConfirmee from "./pages/InscriptionConfirmee";
 import GestionMenu from "./pages/GestionMenu";
 import InscriptionLivreur from "./pages/InscriptionLivreur";
 import TableauDeBordLivreur from "./pages/TableauDeBordLivreur";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/restaurant/menu" element={<GestionMenu />} />
           <Route path="/livreur-inscription" element={<InscriptionLivreur />} />
           <Route path="/livreur/tableau-de-bord" element={<TableauDeBordLivreur />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
