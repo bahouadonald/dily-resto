@@ -6,6 +6,9 @@ import Panier from "./pages/Panier";
 import Livraison from "./pages/Livraison";
 import Paiement from "./pages/Paiement";
 import SuiviCommande from "./pages/SuiviCommande";
+import InscriptionRestaurant from "./pages/InscriptionRestaurant";
+import InscriptionConfirmee from "./pages/InscriptionConfirmee";
+import GestionMenu from "./pages/GestionMenu";
 
 export default function App() {
   return (
@@ -18,6 +21,9 @@ export default function App() {
           <Route path="/livraison" element={<Livraison />} />
           <Route path="/paiement" element={<Paiement />} />
           <Route path="/suivi/:id" element={<SuiviCommande />} />
+          <Route path="/restaurant-inscription" element={<InscriptionRestaurant />} />
+          <Route path="/restaurant/inscription-confirmee" element={<InscriptionConfirmee />} />
+          <Route path="/restaurant/menu" element={<GestionMenu />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
