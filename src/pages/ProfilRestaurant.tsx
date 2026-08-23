@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { useCart } from "../context/CartContext";
 import type { Restaurant, Plat } from "../types/database";
 
 export default function ProfilRestaurant() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { ajouterAuPanier, lignes } = useCart();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [plats, setPlats] = useState<Plat[]>([]);
   const [chargement, setChargement] = useState(true);
@@ -49,11 +51,20 @@ export default function ProfilRestaurant() {
   if (erreur) return <p>Erreur : {erreur}</p>;
   if (!restaurant) return <p>Restaurant introuvable.</p>;
 
+  const nombreArticlesPanier = lignes.reduce((s, l) => s + l.quantite, 0);
+
   return (
-    <div style={{ maxWidth: 420, margin: "0 auto", padding: 16 }}>
-      <button onClick={() => navigate(-1)} style={{ marginBottom: 12 }}>
-        ← Retour
-      </button>
+    <div style={{ maxWidth: 420, margin: "0 auto", padding: 16, paddingBottom: 80 }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <button onClick={() => navigate(-1)} style={{ marginBottom: 12 }}>
+          ← Retour
+        </button>
+        {nombreArticlesPanier > 0 && (
+          <button onClick={() => navigate("/panier")}>
+            🛒 Panier ({nombreArticlesPanier})
+          </button>
+        )}
+      </div>
 
       <div
         style={{
@@ -100,6 +111,7 @@ export default function ProfilRestaurant() {
               <p style={{ fontWeight: 600, margin: 0 }}>{plat.prix} FCFA</p>
             </div>
             <button
+              onClick={() => ajouterAuPanier(plat)}
               style={{
                 padding: "8px 14px",
                 borderRadius: 8,
@@ -108,7 +120,7 @@ export default function ProfilRestaurant() {
                 color: "white",
               }}
             >
-              Commander
+              Ajouter
             </button>
           </div>
         ))}
