@@ -14,6 +14,7 @@ import InscriptionLivreur from "./pages/InscriptionLivreur";
 import TableauDeBordLivreur from "./pages/TableauDeBordLivreur";
 import FeuilleDeRoute from "./pages/FeuilleDeRoute";
 import AdminDashboard from "./pages/AdminDashboard";
+import StatsEntreprise from "./pages/StatsEntreprise";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/livreur/tableau-de-bord" element={<TableauDeBordLivreur />} />
           <Route path="/livreur/tournee" element={<FeuilleDeRoute />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/entreprises" element={<StatsEntreprise />} />
         </Routes>
       </BrowserRouter>
     </CartProvider>
