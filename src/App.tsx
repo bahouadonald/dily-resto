@@ -9,8 +9,10 @@ import SuiviCommande from "./pages/SuiviCommande";
 import InscriptionRestaurant from "./pages/InscriptionRestaurant";
 import InscriptionConfirmee from "./pages/InscriptionConfirmee";
 import GestionMenu from "./pages/GestionMenu";
+import CommandesRestaurant from "./pages/CommandesRestaurant";
 import InscriptionLivreur from "./pages/InscriptionLivreur";
 import TableauDeBordLivreur from "./pages/TableauDeBordLivreur";
+import FeuilleDeRoute from "./pages/FeuilleDeRoute";
 import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
@@ -27,8 +29,10 @@ export default function App() {
           <Route path="/restaurant-inscription" element={<InscriptionRestaurant />} />
           <Route path="/restaurant/inscription-confirmee" element={<InscriptionConfirmee />} />
           <Route path="/restaurant/menu" element={<GestionMenu />} />
+          <Route path="/restaurant/commandes" element={<CommandesRestaurant />} />
           <Route path="/livreur-inscription" element={<InscriptionLivreur />} />
           <Route path="/livreur/tableau-de-bord" element={<TableauDeBordLivreur />} />
+          <Route path="/livreur/tournee" element={<FeuilleDeRoute />} />
           <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </BrowserRouter>
