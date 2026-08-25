@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabase";
 import type { Livreur } from "../types/database";
 
@@ -23,12 +23,51 @@ export default function FeuilleDeRoute() {
   const [tournee, setTournee] = useState<Tournee | null>(null);
   const [etapes, setEtapes] = useState<Etape[]>([]);
   const [chargement, setChargement] = useState(true);
+  const watchIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     chargerDonnees();
     const intervalle = setInterval(chargerDonnees, 15000);
     return () => clearInterval(intervalle);
   }, []);
+
+  // Démarre/arrête le suivi GPS selon que le livreur est en tournée ou non
+  useEffect(() => {
+    if (tournee?.statut === "en_cours") {
+      demarrerSuiviGPS();
+    } else {
+      arreterSuiviGPS();
+    }
+    return () => arreterSuiviGPS();
+  }, [tournee?.statut]);
+
+  function demarrerSuiviGPS() {
+    if (watchIdRef.current !== null) return; // déjà actif
+    if (!navigator.geolocation) return;
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      async (position) => {
+        if (!livreur) return;
+        await supabase
+          .from("livreurs")
+          .update({
+            latitude_actuelle: position.coords.latitude,
+            longitude_actuelle: position.coords.longitude,
+            derniere_maj_position: new Date().toISOString(),
+          })
+          .eq("id", livreur.id);
+      },
+      (erreur) => console.error("Erreur GPS :", erreur),
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
+    );
+  }
+
+  function arreterSuiviGPS() {
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+  }
 
   async function chargerDonnees() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -108,6 +147,7 @@ export default function FeuilleDeRoute() {
       .from("tournees")
       .update({ statut: "terminee", heure_fin_reelle: new Date().toISOString() })
       .eq("id", tournee.id);
+    arreterSuiviGPS();
     chargerDonnees();
   }
 
@@ -134,6 +174,9 @@ export default function FeuilleDeRoute() {
       <p style={{ color: "#666" }}>
         {tournee.nombre_plats} plats · Statut : {tournee.statut}
       </p>
+      {tournee.statut === "en_cours" && (
+        <p style={{ fontSize: 12, color: "#2E6F4E" }}>📍 Position partagée en direct</p>
+      )}
 
       {tournee.statut === "planifiee" && (
         <button
