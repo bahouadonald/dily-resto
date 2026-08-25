@@ -28,7 +28,6 @@ export interface Plat {
   categorie: string | null;
   photo_url: string | null;
   disponible: boolean;
-  // jointure optionnelle si on récupère le restaurant en même temps
   restaurants?: Restaurant;
 }
 
@@ -39,6 +38,8 @@ export interface Travailleur {
   entreprise: string | null;
   zone_id: string | null;
   lieu_travail: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface Livreur {
@@ -48,6 +49,8 @@ export interface Livreur {
   moyen_transport: string | null;
   zone_id: string | null;
   statut: "disponible" | "en_course" | "hors_ligne";
+  latitude_actuelle?: number | null;
+  longitude_actuelle?: number | null;
 }
 
 export interface Commande {
@@ -57,8 +60,10 @@ export interface Commande {
   livreur_id: string | null;
   statut:
     | "en_attente"
+    | "hors_fenetre"
     | "confirmee"
     | "en_preparation"
+    | "prete"
     | "en_livraison"
     | "livree"
     | "annulee";
