@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
 
+const TAUX_COMMISSION = 0.30; // 30% sur le prix fixé par le restaurant
+
 export default function Paiement() {
   const { lignes, total, viderPanier } = useCart();
   const navigate = useNavigate();
@@ -14,13 +16,12 @@ export default function Paiement() {
   );
   const fraisLivraison = livraisonInfo.fraisLivraison || 0;
   const totalFinal = total + fraisLivraison;
+  const commissionMontant = Math.round(total * TAUX_COMMISSION);
 
   async function payer() {
     setEnCours(true);
     setErreur(null);
 
-    // Étape 1 : créer la commande dans Supabase
-    // Note : travailleur_id et restaurant_id à connecter une fois l'auth en place
     const restaurantId = lignes[0]?.plat.restaurant_id;
 
     const { data: commande, error: erreurCommande } = await supabase
@@ -29,7 +30,8 @@ export default function Paiement() {
         restaurant_id: restaurantId,
         montant_total: total,
         frais_livraison: fraisLivraison,
-        statut: "en_attente",
+        commission_montant: commissionMontant,
+        statut: "confirmee",
       })
       .select()
       .single();
@@ -40,7 +42,6 @@ export default function Paiement() {
       return;
     }
 
-    // Étape 2 : enregistrer les plats de la commande
     const lignesCommande = lignes.map((l) => ({
       commande_id: commande.id,
       plat_id: l.plat.id,
@@ -49,9 +50,6 @@ export default function Paiement() {
     }));
 
     await supabase.from("commande_plats").insert(lignesCommande);
-
-    // Étape 3 : le paiement réel (agrégateur mobile money) se branchera ici,
-    // côté backend Render, une fois cette partie développée
 
     viderPanier();
     localStorage.removeItem("dily-resto-livraison");
@@ -76,7 +74,6 @@ export default function Paiement() {
         <p style={{ fontSize: 14, color: "#666" }}>
           Moyen de paiement : Orange Money / MTN Money / Wave
         </p>
-        {/* L'intégration réelle de l'agrégateur viendra ici */}
       </div>
 
       {erreur && <p style={{ color: "red" }}>{erreur}</p>}
