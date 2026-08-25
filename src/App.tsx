@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/CartContext";
+import Accueil from "./pages/Accueil";
 import CataloguePlats from "./pages/CataloguePlats";
 import ProfilRestaurant from "./pages/ProfilRestaurant";
 import Panier from "./pages/Panier";
@@ -21,7 +22,8 @@ export default function App() {
     <CartProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<CataloguePlats />} />
+          <Route path="/" element={<Accueil />} />
+          <Route path="/commander" element={<CataloguePlats />} />
           <Route path="/restaurant/:id" element={<ProfilRestaurant />} />
           <Route path="/panier" element={<Panier />} />
           <Route path="/livraison" element={<Livraison />} />
