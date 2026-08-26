@@ -66,42 +66,78 @@ export default function InscriptionTravailleur() {
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
         <label>
           Nom complet
-          <input type="text" value={nom} onChange={(e) => setNom(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="text"
+            value={nom}
+            onChange={(e) => setNom(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
 
         <label>
           Téléphone
-          <input type="tel" value={telephone} onChange={(e) => setTelephone(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
 
         <label>
           Ta zone
-          <select value={zoneId} onChange={(e) => setZoneId(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }}>
+          <select
+            value={zoneId}
+            onChange={(e) => setZoneId(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          >
             <option value="">Choisis ta zone</option>
             {zones.map((z) => (
-              <option key={z.id} value={z.id}>{z.nom}</option>
+              <option key={z.id} value={z.id}>
+                {z.nom}
+              </option>
             ))}
           </select>
         </label>
 
         <label>
           Lieu de travail (adresse)
-          <input type="text" value={lieuTravail} onChange={(e) => setLieuTravail(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="text"
+            value={lieuTravail}
+            onChange={(e) => setLieuTravail(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
 
         <label>
           Entreprise (optionnel)
-          <input type="text" value={entreprise} onChange={(e) => setEntreprise(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="text"
+            value={entreprise}
+            onChange={(e) => setEntreprise(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
 
         <label>
           Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
 
         <label>
           Mot de passe
-          <input type="password" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="password"
+            value={motDePasse}
+            onChange={(e) => setMotDePasse(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
       </div>
 
@@ -110,7 +146,16 @@ export default function InscriptionTravailleur() {
       <button
         onClick={sInscrire}
         disabled={enCours || !email || !motDePasse || !nom || !zoneId}
-        style={{ width: "100%", padding: 12, borderRadius: 8, border: "none", background: "var(--dily-vert)", color: "white", fontWeight: 600, marginTop: 16 }}
+        style={{
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "none",
+          background: "var(--dily-vert)",
+          color: "white",
+          fontWeight: 600,
+          marginTop: 16,
+        }}
       >
         {enCours ? "Création..." : "Créer mon compte"}
       </button>
