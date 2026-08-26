@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import logo from "../logo.png";
 
 export default function Accueil() {
   const navigate = useNavigate();
 
   return (
     <div style={{ minHeight: "100vh" }}>
-      {/* Bandeau du haut avec les 3 espaces */}
       <header
         style={{
           display: "flex",
@@ -17,26 +17,15 @@ export default function Accueil() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: "var(--dily-vert)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "white",
-              fontWeight: 700,
-              fontSize: 18,
-            }}
-          >
-            D
-          </div>
+          <img
+            src={logo}
+            alt="Dily resto"
+            style={{ width: 36, height: 36, borderRadius: 10, objectFit: "cover" }}
+          />
           <span style={{ fontWeight: 700, fontSize: 18 }}>Dily resto</span>
         </div>
 
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button
             onClick={() => navigate("/restaurant-inscription")}
             style={{
@@ -63,10 +52,23 @@ export default function Accueil() {
           >
             Espace livreur
           </button>
+          <button
+            onClick={() => navigate("/connexion")}
+            style={{
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "none",
+              background: "var(--dily-vert)",
+              color: "white",
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            Connexion
+          </button>
         </div>
       </header>
 
-      {/* Section principale — mise en avant du travailleur */}
       <section
         style={{
           padding: "40px 20px",
@@ -98,7 +100,6 @@ export default function Accueil() {
         </button>
       </section>
 
-      {/* Bloc explicatif rapide */}
       <section style={{ padding: "32px 20px", maxWidth: 420, margin: "0 auto" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
