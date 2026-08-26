@@ -24,7 +24,6 @@ export default function Connexion() {
       return;
     }
 
-    // On détermine le type de compte pour rediriger au bon endroit
     const { data: restaurant } = await supabase
       .from("restaurants")
       .select("id")
@@ -47,7 +46,6 @@ export default function Connexion() {
       return;
     }
 
-    // Sinon, c'est un travailleur
     navigate("/commander");
   }
 
@@ -58,12 +56,22 @@ export default function Connexion() {
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
         <label>
           Email
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
 
         <label>
           Mot de passe
-          <input type="password" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} style={{ width: "100%", padding: 10, marginTop: 4 }} />
+          <input
+            type="password"
+            value={motDePasse}
+            onChange={(e) => setMotDePasse(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          />
         </label>
       </div>
 
@@ -72,13 +80,23 @@ export default function Connexion() {
       <button
         onClick={seConnecter}
         disabled={enCours || !email || !motDePasse}
-        style={{ width: "100%", padding: 12, borderRadius: 8, border: "none", background: "var(--dily-vert)", color: "white", fontWeight: 600, marginTop: 16 }}
+        style={{
+          width: "100%",
+          padding: 12,
+          borderRadius: 8,
+          border: "none",
+          background: "var(--dily-vert)",
+          color: "white",
+          fontWeight: 600,
+          marginTop: 16,
+        }}
       >
         {enCours ? "Connexion..." : "Se connecter"}
       </button>
 
       <p style={{ textAlign: "center", marginTop: 16, fontSize: 13 }}>
-        Pas encore de compte ?<br />
+        Pas encore de compte ?
+        <br />
         <a href="/travailleur-inscription">Je suis travailleur</a> ·{" "}
         <a href="/restaurant-inscription">Je suis restaurant</a> ·{" "}
         <a href="/livreur-inscription">Je suis livreur</a>
