@@ -7,28 +7,87 @@ export default function CataloguePlats() {
   const [plats, setPlats] = useState<Plat[]>([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState<string | null>(null);
+  const [pasDeCompte, setPasDeCompte] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function chargerPlats() {
-      setChargement(true);
-      const { data, error } = await supabase
-        .from("plats")
-        .select("*, restaurants(*)")
-        .eq("disponible", true);
-
-      if (error) {
-        setErreur(error.message);
-      } else {
-        setPlats(data as Plat[]);
-      }
-      setChargement(false);
-    }
-
     chargerPlats();
   }, []);
 
+  async function chargerPlats() {
+    setChargement(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      setPasDeCompte(true);
+      setChargement(false);
+      return;
+    }
+
+    const { data: travailleur } = await supabase
+      .from("travailleurs")
+      .select("zone_id")
+      .eq("auth_user_id", user.id)
+      .single();
+
+    if (!travailleur) {
+      setPasDeCompte(true);
+      setChargement(false);
+      return;
+    }
+
+    let requete = supabase
+      .from("plats")
+      .select("*, restaurants!inner(*)")
+      .eq("disponible", true)
+      .eq("restaurants.statut", "actif");
+
+    if (travailleur.zone_id) {
+      requete = requete.eq("restaurants.zone_id", travailleur.zone_id);
+    }
+
+    const { data, error } = await requete;
+
+    if (error) {
+      setErreur(error.message);
+    } else {
+      setPlats(data as Plat[]);
+    }
+    setChargement(false);
+  }
+
   if (chargement) return <p>Chargement des plats...</p>;
+
+  if (pasDeCompte) {
+    return (
+      <div style={{ maxWidth: 420, margin: "0 auto", padding: 40, textAlign: "center" }}>
+        <h1 style={{ fontSize: 22 }}>Crée ton compte pour commander</h1>
+        <p style={{ color: "#666", marginBottom: 24 }}>
+          Il te faut un compte pour voir les restaurants de ta zone et passer
+          commande.
+        </p>
+        <button
+          onClick={() => navigate("/travailleur-inscription")}
+          style={{
+            padding: "14px 28px",
+            borderRadius: 12,
+            border: "none",
+            background: "var(--dily-vert)",
+            color: "white",
+            fontWeight: 700,
+            fontSize: 15,
+          }}
+        >
+          Créer mon compte
+        </button>
+        <p style={{ marginTop: 16, fontSize: 14 }}>
+          Déjà inscrit ? <a href="/connexion">Se connecter</a>
+        </p>
+      </div>
+    );
+  }
+
   if (erreur) return <p>Erreur : {erreur}</p>;
 
   return (
@@ -58,6 +117,7 @@ export default function CataloguePlats() {
             </div>
           </div>
         ))}
+        {plats.length === 0 && <p>Aucun restaurant partenaire dans ta zone pour le moment.</p>}
       </div>
     </div>
   );
