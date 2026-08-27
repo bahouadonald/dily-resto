@@ -16,6 +16,7 @@ import CommandesRestaurant from "./pages/CommandesRestaurant";
 import InscriptionLivreur from "./pages/InscriptionLivreur";
 import TableauDeBordLivreur from "./pages/TableauDeBordLivreur";
 import FeuilleDeRoute from "./pages/FeuilleDeRoute";
+import GainsLivreur from "./pages/GainsLivreur";
 import AdminDashboard from "./pages/AdminDashboard";
 import StatsEntreprise from "./pages/StatsEntreprise";
 
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/livreur-inscription" element={<InscriptionLivreur />} />
           <Route path="/livreur/tableau-de-bord" element={<TableauDeBordLivreur />} />
           <Route path="/livreur/tournee" element={<FeuilleDeRoute />} />
+          <Route path="/livreur/gains" element={<GainsLivreur />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/entreprises" element={<StatsEntreprise />} />
         </Routes>
