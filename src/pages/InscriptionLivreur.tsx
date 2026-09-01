@@ -1,21 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { telephoneVersEmail } from "../lib/authPhone";
+
+interface Zone {
+  id: string;
+  nom: string;
+}
 
 export default function InscriptionLivreur() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [telephone, setTelephone] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [nom, setNom] = useState("");
-  const [telephone, setTelephone] = useState("");
   const [moyenTransport, setMoyenTransport] = useState("moto");
+  const [zoneId, setZoneId] = useState("");
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
+  useEffect(() => {
+    supabase.from("zones").select("id, nom").then(({ data }) => setZones(data || []));
+  }, []);
+
   async function sInscrire() {
-    if (!email || !motDePasse || !nom || !telephone) return;
+    if (!telephone || !motDePasse || !nom || !zoneId) return;
     setEnCours(true);
     setErreur(null);
+
+    const email = telephoneVersEmail(telephone);
 
     const { data: authData, error: erreurAuth } = await supabase.auth.signUp({
       email,
@@ -33,6 +46,7 @@ export default function InscriptionLivreur() {
       nom,
       telephone,
       moyen_transport: moyenTransport,
+      zone_id: zoneId,
       statut: "hors_ligne",
     });
 
@@ -43,7 +57,7 @@ export default function InscriptionLivreur() {
     }
 
     setEnCours(false);
-    navigate("/livreur/tableau-de-bord");
+    navigate("/livreur/tournee");
   }
 
   return (
@@ -62,13 +76,19 @@ export default function InscriptionLivreur() {
         </label>
 
         <label>
-          Téléphone
-          <input
-            type="tel"
-            value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
+          Ta zone
+          <select
+            value={zoneId}
+            onChange={(e) => setZoneId(e.target.value)}
             style={{ width: "100%", padding: 10, marginTop: 4 }}
-          />
+          >
+            <option value="">Choisis ta zone</option>
+            {zones.map((z) => (
+              <option key={z.id} value={z.id}>
+                {z.nom}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -85,11 +105,12 @@ export default function InscriptionLivreur() {
         </label>
 
         <label>
-          Email
+          Téléphone (sert d'identifiant de connexion)
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            placeholder="07 00 00 00 00"
             style={{ width: "100%", padding: 10, marginTop: 4 }}
           />
         </label>
@@ -109,13 +130,13 @@ export default function InscriptionLivreur() {
 
       <button
         onClick={sInscrire}
-        disabled={enCours || !email || !motDePasse || !nom || !telephone}
+        disabled={enCours || !telephone || !motDePasse || !nom || !zoneId}
         style={{
           width: "100%",
           padding: 12,
           borderRadius: 8,
           border: "none",
-          background: "#2E6F4E",
+          background: "var(--dily-vert)",
           color: "white",
           fontWeight: 600,
           marginTop: 16,
