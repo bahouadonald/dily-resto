@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { telephoneVersEmail } from "../lib/authPhone";
 
 export default function Connexion() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [identifiant, setIdentifiant] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
@@ -13,13 +14,15 @@ export default function Connexion() {
     setEnCours(true);
     setErreur(null);
 
+    const email = identifiant.includes("@") ? identifiant : telephoneVersEmail(identifiant);
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password: motDePasse,
     });
 
     if (error || !data.user) {
-      setErreur("Email ou mot de passe incorrect.");
+      setErreur("Identifiant ou mot de passe incorrect.");
       setEnCours(false);
       return;
     }
@@ -55,11 +58,12 @@ export default function Connexion() {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 16 }}>
         <label>
-          Email
+          Téléphone ou email
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            value={identifiant}
+            onChange={(e) => setIdentifiant(e.target.value)}
+            placeholder="07 00 00 00 00"
             style={{ width: "100%", padding: 10, marginTop: 4 }}
           />
         </label>
@@ -79,7 +83,7 @@ export default function Connexion() {
 
       <button
         onClick={seConnecter}
-        disabled={enCours || !email || !motDePasse}
+        disabled={enCours || !identifiant || !motDePasse}
         style={{
           width: "100%",
           padding: 12,
