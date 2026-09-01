@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { telephoneVersEmail } from "../lib/authPhone";
 
 interface Zone {
   id: string;
@@ -10,10 +11,9 @@ interface Zone {
 export default function InscriptionTravailleur() {
   const navigate = useNavigate();
   const [zones, setZones] = useState<Zone[]>([]);
-  const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [nom, setNom] = useState("");
-  const [telephone, setTelephone] = useState("");
   const [entreprise, setEntreprise] = useState("");
   const [lieuTravail, setLieuTravail] = useState("");
   const [zoneId, setZoneId] = useState("");
@@ -25,9 +25,11 @@ export default function InscriptionTravailleur() {
   }, []);
 
   async function sInscrire() {
-    if (!email || !motDePasse || !nom || !zoneId) return;
+    if (!telephone || !motDePasse || !nom || !zoneId) return;
     setEnCours(true);
     setErreur(null);
+
+    const email = telephoneVersEmail(telephone);
 
     const { data: authData, error: erreurAuth } = await supabase.auth.signUp({
       email,
@@ -75,16 +77,6 @@ export default function InscriptionTravailleur() {
         </label>
 
         <label>
-          Téléphone
-          <input
-            type="tel"
-            value={telephone}
-            onChange={(e) => setTelephone(e.target.value)}
-            style={{ width: "100%", padding: 10, marginTop: 4 }}
-          />
-        </label>
-
-        <label>
           Ta zone
           <select
             value={zoneId}
@@ -121,11 +113,12 @@ export default function InscriptionTravailleur() {
         </label>
 
         <label>
-          Email
+          Téléphone (sert d'identifiant de connexion)
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            placeholder="07 00 00 00 00"
             style={{ width: "100%", padding: 10, marginTop: 4 }}
           />
         </label>
@@ -145,7 +138,7 @@ export default function InscriptionTravailleur() {
 
       <button
         onClick={sInscrire}
-        disabled={enCours || !email || !motDePasse || !nom || !zoneId}
+        disabled={enCours || !telephone || !motDePasse || !nom || !zoneId}
         style={{
           width: "100%",
           padding: 12,
