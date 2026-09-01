@@ -1,22 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import { telephoneVersEmail } from "../lib/authPhone";
+
+interface Zone {
+  id: string;
+  nom: string;
+}
 
 export default function InscriptionRestaurant() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [telephone, setTelephone] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
+  const [zoneId, setZoneId] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [gpsEnCours, setGpsEnCours] = useState(false);
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
 
+  useEffect(() => {
+    supabase.from("zones").select("id, nom").then(({ data }) => setZones(data || []));
+  }, []);
+
+  function capterPosition() {
+    if (!navigator.geolocation) {
+      setErreur("La géolocalisation n'est pas disponible sur cet appareil.");
+      return;
+    }
+    setGpsEnCours(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setGpsEnCours(false);
+      },
+      () => {
+        setErreur("Impossible de récupérer ta position. Vérifie que la localisation est autorisée.");
+        setGpsEnCours(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  }
+
   async function sInscrire() {
-    if (!email || !motDePasse || !nom) return;
+    if (!telephone || !motDePasse || !nom || !zoneId) return;
     setEnCours(true);
     setErreur(null);
 
-    // Étape 1 : créer le compte d'authentification
+    const email = telephoneVersEmail(telephone);
+
     const { data: authData, error: erreurAuth } = await supabase.auth.signUp({
       email,
       password: motDePasse,
@@ -28,12 +64,15 @@ export default function InscriptionRestaurant() {
       return;
     }
 
-    // Étape 2 : créer la fiche restaurant, liée au compte
     const { error: erreurRestaurant } = await supabase.from("restaurants").insert({
       auth_user_id: authData.user.id,
       nom,
       description,
-      statut: "en_attente", // validé ensuite par l'administration
+      telephone,
+      zone_id: zoneId,
+      latitude,
+      longitude,
+      statut: "en_attente",
     });
 
     if (erreurRestaurant) {
@@ -72,11 +111,53 @@ export default function InscriptionRestaurant() {
         </label>
 
         <label>
-          Email
+          Ta zone
+          <select
+            value={zoneId}
+            onChange={(e) => setZoneId(e.target.value)}
+            style={{ width: "100%", padding: 10, marginTop: 4 }}
+          >
+            <option value="">Choisis ta zone</option>
+            {zones.map((z) => (
+              <option key={z.id} value={z.id}>
+                {z.nom}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div>
+          <button
+            type="button"
+            onClick={capterPosition}
+            disabled={gpsEnCours}
+            style={{
+              width: "100%",
+              padding: 10,
+              borderRadius: 8,
+              border: "1px solid var(--dily-bordure)",
+              background: latitude ? "#EAF7F0" : "white",
+              fontWeight: 600,
+            }}
+          >
+            {gpsEnCours
+              ? "Localisation en cours..."
+              : latitude
+              ? "✓ Position enregistrée"
+              : "📍 Utiliser ma position GPS actuelle"}
+          </button>
+          <p style={{ fontSize: 12, color: "#888", margin: "4px 0 0" }}>
+            À faire depuis l'emplacement réel du restaurant.
+          </p>
+        </div>
+
+        <label>
+          Téléphone (sert d'identifiant de connexion)
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="tel"
+            value={telephone}
+            onChange={(e) => setTelephone(e.target.value)}
+            placeholder="07 00 00 00 00"
             style={{ width: "100%", padding: 10, marginTop: 4 }}
           />
         </label>
@@ -96,13 +177,13 @@ export default function InscriptionRestaurant() {
 
       <button
         onClick={sInscrire}
-        disabled={enCours || !email || !motDePasse || !nom}
+        disabled={enCours || !telephone || !motDePasse || !nom || !zoneId}
         style={{
           width: "100%",
           padding: 12,
           borderRadius: 8,
           border: "none",
-          background: "#2E6F4E",
+          background: "var(--dily-vert)",
           color: "white",
           fontWeight: 600,
           marginTop: 16,
